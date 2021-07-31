@@ -23,9 +23,11 @@ import pandas as pd
 # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin
 
 class FirstStep2Seq():
-  def __init__(self, vcf=None, label_csv=None):
+  def __init__(self, vcf=None, label_csv=None, annotations=None, embeddings_file=None):
     self.vcf = vcf
     self.label_csv = label_csv
+    self.annotations = annotations
+    self.embeddings_file = embeddings_file
 
     self.sample_names = None
     self.X = None
@@ -78,8 +80,8 @@ class FirstStep2Seq():
     return y
 
   def create_embedding_matrix(self):
-    headers = pd.read_csv('./data/gvcf2seq.annotation_embeddings.csv', nrows=0)
-    embedding_df = pd.read_csv('./data/gvcf2seq.annotation_embeddings.csv', usecols=[h for h in headers.columns if h != 'key'], dtype=np.float32)
+    headers = pd.read_csv(self.annotations, nrows=0)
+    embedding_df = pd.read_csv(self.annotations, usecols=[h for h in headers.columns if h != 'key'], dtype=np.float32)
     return embedding_df.values
 
   def indices2embeddings(self, data):
@@ -141,7 +143,7 @@ class FirstStep2Seq():
   # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin/hubble.py#L188
   def precomputed_embeddings(self):
     wd = sys.path[0]
-    file = os.path.join(wd, "./data/embeddings.txt")
+    file = os.path.join(wd, self.embeddings_file)
 
     embeddings = {}
     with open(file) as f:
