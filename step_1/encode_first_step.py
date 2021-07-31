@@ -23,11 +23,12 @@ import pandas as pd
 # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin
 
 class FirstStep2Seq():
-  def __init__(self, vcf=None, label_csv=None, annotations=None, embeddings_file=None):
+  def __init__(self, vcf, label_csv, annotations, embeddings_file, ref_file):
     self.vcf = vcf
     self.label_csv = label_csv
     self.annotations = annotations
     self.embeddings_file = embeddings_file
+    self.ref_file = ref_file
 
     self.sample_names = None
     self.X = None
@@ -173,7 +174,7 @@ class FirstStep2Seq():
   def get_reference_seq(self):
     ref = None
     # Convert embedding indices of reference gene into list
-    with open('./data/ref.seq') as f:
+    with open(self.ref_file) as f:
       ref = f.readline().rstrip().split()[1:][0].split(',')
 
     return ref
