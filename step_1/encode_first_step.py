@@ -23,12 +23,12 @@ import pandas as pd
 # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin
 
 class FirstStep2Seq():
-  def __init__(self, vcf, label_csv, annotations, embeddings_file, ref_file):
+  def __init__(self, vcf, labels, embedding_file, annotation_file, ref_seq):
     self.vcf = vcf
-    self.label_csv = label_csv
-    self.annotations = annotations
-    self.embeddings_file = embeddings_file
-    self.ref_file = ref_file
+    self.labels = labels
+    self.embedding_file = embedding_file
+    self.annotation_file = annotation_file
+    self.ref_seq = ref_seq
 
     self.sample_names = None
     self.X = None
@@ -37,6 +37,7 @@ class FirstStep2Seq():
     self.embeddings = self.create_embedding_matrix()
 
     seqs = self.build_seqs()
+    keys = list(seqs.keys())
     data = self.format_seqs(seqs)
 
     self.X = data["X"]
@@ -71,7 +72,7 @@ class FirstStep2Seq():
     return data
 
   def get_labels(self, samples):
-    y_df = pd.read_csv(self.label_csv, header=None, index_col=0, usecols=[0, 6], names=['name', 'pt'])
+    y_df = pd.read_csv(self.labels, header=None, index_col=0, usecols=[0, 6], names=['name', 'pt'])
     try:
       y = y_df.loc[samples].values
     except KeyError:
@@ -81,8 +82,8 @@ class FirstStep2Seq():
     return y
 
   def create_embedding_matrix(self):
-    headers = pd.read_csv(self.annotations, nrows=0)
-    embedding_df = pd.read_csv(self.annotations, usecols=[h for h in headers.columns if h != 'key'], dtype=np.float32)
+    headers = pd.read_csv(self.annotation_file, nrows=0)
+    embedding_df = pd.read_csv(self.annotation_file, usecols=[h for h in headers.columns if h != 'key'], dtype=np.float32)
     return embedding_df.values
 
   def indices2embeddings(self, data):
@@ -99,6 +100,7 @@ class FirstStep2Seq():
     sample_seqs = self.init_seq_data(samples)
     embeddings = self.precomputed_embeddings()
     ignored_variants, variant_count = 0, 0
+    previous = []
 
     with open(self.vcf) as f:
       for line in f:
@@ -144,10 +146,10 @@ class FirstStep2Seq():
   # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin/hubble.py#L188
   def precomputed_embeddings(self):
     wd = sys.path[0]
-    file = os.path.join(wd, self.embeddings_file)
+    _file = os.path.join(wd, self.embedding_file)
 
     embeddings = {}
-    with open(file) as f:
+    with open(_file) as f:
       for line in f:
         fields = line.rstrip().split()
         key = "%s_%s" % (fields[1], fields[2])
@@ -174,7 +176,7 @@ class FirstStep2Seq():
   def get_reference_seq(self):
     ref = None
     # Convert embedding indices of reference gene into list
-    with open(self.ref_file) as f:
+    with open(self.ref_seq) as f:
       ref = f.readline().rstrip().split()[1:][0].split(',')
 
     return ref
@@ -186,7 +188,7 @@ class FirstStep2Seq():
     # There could be a more efficient method than storing two copies of the reference gene for each ht
     # Maybe only store changes?
     for s in samples:
-      sample_seqs[s] = [reference, reference]
+      sample_seqs[s] = [reference.copy(), reference.copy()]
 
     return sample_seqs
 
@@ -202,6 +204,7 @@ class FirstStep2Seq():
     return samples
 
 if __name__=='__main__':
-  embedding = FirstStep2Seq(vcf='./simulated_cyp2d6_diplotypes/batch_4.vcf', label_csv='./simulated_cyp2d6_diplotypes/batch_4.labels.csv')
+  embedding = FirstStep2Seq(vcf='./simulated_cyp2d6_diplotypes/batch_4.vcf', labels='./simulated_cyp2d6_diplotypes/batch_4.labels.csv', embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq')
   print("Embeddings...")
-  print(embedding.X.shape, embedding.y.shape)
+  np.set_printoptions(threshold=np.inf)
+  print(embedding.X.shape)
