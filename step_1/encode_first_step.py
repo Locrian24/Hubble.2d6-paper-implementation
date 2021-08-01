@@ -99,7 +99,6 @@ class FirstStep2Seq():
     samples = self.get_samples(self.vcf)
     sample_seqs = self.init_seq_data(samples)
     embeddings = self.precomputed_embeddings()
-    ignored_variants, variant_count = 0, 0
     previous = []
 
     with open(self.vcf) as f:
@@ -108,14 +107,12 @@ class FirstStep2Seq():
           continue
 
         vcf_row = self.parse_vcf_line(line)
-        variant_count += 1
 
         #! - Alt embedding is array of embeddings
         current_embeddings = self.get_embedding(embeddings, ref=vcf_row['ref_key'], alts=vcf_row['alt_key'])
 
         if current_embeddings is None:
           # Skip variants with no encodings :(
-          ignored_variants += 1
           continue
 
         # For each row, build embeddings of each sample entry in row
@@ -130,7 +127,6 @@ class FirstStep2Seq():
           sample_seqs[s][0][h1_position_idx] = h1_embedding_idx
           sample_seqs[s][1][h2_position_idx] = h2_embedding_idx
 
-    print("Ignored %d variants out of %d" % (ignored_variants, variant_count));
     return sample_seqs
 
   def get_embedding(self, embeddings, ref, alts):
