@@ -45,7 +45,7 @@ class Encode2Seq():
 
     self.X = data["X"]
     self.y = data["y"]
-    self.sample_names = data["sample_names"]
+    self.sample_names = np.array(data["sample_names"])
 
   def format_seqs(self, seq_data):
     sample_names = []
@@ -220,4 +220,5 @@ if __name__=='__main__':
   embedding = Encode2Seq(vcf=options.vcf, labels=options.labels, embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq', verbose=True, label_cols=[0, 1])
   print("Embeddings...")
   np.set_printoptions(threshold=np.inf)
+  print(embedding.sample_names.shape)
   print(embedding.X.shape, embedding.y.shape)
