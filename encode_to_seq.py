@@ -22,7 +22,7 @@ import pandas as pd
 # Only main change is the encoding of diplotypes
 # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin
 
-class FirstStep2Seq():
+class Encode2Seq():
   def __init__(self, vcf, labels, embedding_file, annotation_file, ref_seq):
     self.vcf = vcf
     self.labels = labels
@@ -200,7 +200,7 @@ class FirstStep2Seq():
     return samples
 
 if __name__=='__main__':
-  embedding = FirstStep2Seq(vcf='./simulated_cyp2d6_diplotypes/batch_4.vcf', labels='./simulated_cyp2d6_diplotypes/batch_4.labels.csv', embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq')
+  embedding = Encode2Seq(vcf='./simulated_cyp2d6_diplotypes/batch_4.vcf', labels='./simulated_cyp2d6_diplotypes/batch_4.labels.csv', embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq')
   print("Embeddings...")
   np.set_printoptions(threshold=np.inf)
   print(embedding.X.shape)
