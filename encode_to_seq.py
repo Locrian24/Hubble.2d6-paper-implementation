@@ -2,6 +2,7 @@ import sys
 import os
 import numpy as np
 import pandas as pd
+import argparse
 # Since simulated diplotypes are based on
 # existing star alleles, no need for custom annotation
 
@@ -23,12 +24,14 @@ import pandas as pd
 # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin
 
 class Encode2Seq():
-  def __init__(self, vcf, labels, embedding_file, annotation_file, ref_seq):
+  def __init__(self, vcf, labels, embedding_file, annotation_file, ref_seq, verbose=False, label_cols=[0, 6]):
     self.vcf = vcf
     self.labels = labels
     self.embedding_file = embedding_file
     self.annotation_file = annotation_file
     self.ref_seq = ref_seq
+    self.verbose = verbose
+    self.label_cols = label_cols
 
     self.sample_names = None
     self.X = None
@@ -72,7 +75,7 @@ class Encode2Seq():
     return data
 
   def get_labels(self, samples):
-    y_df = pd.read_csv(self.labels, header=None, index_col=0, usecols=[0, 6], names=['name', 'pt'])
+    y_df = pd.read_csv(self.labels, header=None, index_col=0, usecols=self.label_cols, names=['name', 'pt'])
     try:
       y = y_df.loc[samples].values
     except KeyError:
@@ -100,6 +103,7 @@ class Encode2Seq():
     sample_seqs = self.init_seq_data(samples)
     embeddings = self.precomputed_embeddings()
     previous = []
+    total_variants, skipped = 0, 0
 
     with open(self.vcf) as f:
       for line in f:
@@ -107,11 +111,14 @@ class Encode2Seq():
           continue
 
         vcf_row = self.parse_vcf_line(line)
+        total_variants += 1
 
         #! - Alt embedding is array of embeddings
         current_embeddings = self.get_embedding(embeddings, ref=vcf_row['ref_key'], alts=vcf_row['alt_key'])
 
         if current_embeddings is None:
+          skipped += 1
+          print(vcf_row['ref_key'], vcf_row['alt_key'])
           # Skip variants with no encodings :(
           continue
 
@@ -126,6 +133,9 @@ class Encode2Seq():
 
           sample_seqs[s][0][h1_position_idx] = h1_embedding_idx
           sample_seqs[s][1][h2_position_idx] = h2_embedding_idx
+
+    if self.verbose:
+      print("Skipped %d of %d total variants" % (skipped, total_variants))
 
     return sample_seqs
 
@@ -200,7 +210,12 @@ class Encode2Seq():
     return samples
 
 if __name__=='__main__':
-  embedding = Encode2Seq(vcf='./simulated_cyp2d6_diplotypes/batch_4.vcf', labels='./simulated_cyp2d6_diplotypes/batch_4.labels.csv', embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq')
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-v', '--vcf', help="VCF file to convert")
+  parser.add_argument('-l', '--labels', help="CSV file containing labels to samples")
+  options = parser.parse_args()
+
+  embedding = Encode2Seq(vcf=options.vcf, labels=options.labels, embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq', verbose=True, label_cols=[0, 1])
   print("Embeddings...")
   np.set_printoptions(threshold=np.inf)
-  print(embedding.X.shape)
+  print(embedding.X.shape, embedding.y.shape)
