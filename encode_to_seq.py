@@ -118,7 +118,9 @@ class Encode2Seq():
 
         if current_embeddings is None:
           skipped += 1
-          print(vcf_row['ref_key'], vcf_row['alt_key'])
+          if self.verbose:
+            print(vcf_row['ref_key'], vcf_row['alt_key'])
+
           # Skip variants with no encodings :(
           continue
 
