@@ -28,7 +28,13 @@ def main(options):
     for sample in samples:
         star = "*" + str(sample.split("_")[1])
         label = df[df["CYP2D6 Star Allele"] == star]["Curated Function"].values[0]
-        labels.append([sample, label])
+
+        # Encode scoring system:
+        # https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008399#sec004
+        no_function = 0 if label == "No function" else 1
+        normal_function = 1 if label == "Normal" else 0
+
+        labels.append([sample, no_function, normal_function])
 
     # Save label csv
     label_df = pd.DataFrame(labels)

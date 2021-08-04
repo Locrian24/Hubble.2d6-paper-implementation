@@ -75,7 +75,7 @@ class Encode2Seq():
     return data
 
   def get_labels(self, samples):
-    y_df = pd.read_csv(self.labels, header=None, index_col=0, usecols=self.label_cols, names=['name', 'pt'])
+    y_df = pd.read_csv(self.labels, header=None, index_col=0, usecols=self.label_cols)
     try:
       y = y_df.loc[samples].values
     except KeyError:
@@ -217,7 +217,7 @@ if __name__=='__main__':
   parser.add_argument('-l', '--labels', help="CSV file containing labels to samples")
   options = parser.parse_args()
 
-  embedding = Encode2Seq(vcf=options.vcf, labels=options.labels, embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq', verbose=True, label_cols=[0, 1])
+  embedding = Encode2Seq(vcf=options.vcf, labels=options.labels, embedding_file='./data/embeddings.txt', annotation_file='./data/gvcf2seq.annotation_embeddings.csv', ref_seq='./data/ref.seq', verbose=True, label_cols=[0, 1, 2])
   print("Embeddings...")
   np.set_printoptions(threshold=np.inf)
   print(embedding.sample_names.shape)
