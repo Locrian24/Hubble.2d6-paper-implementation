@@ -17,7 +17,7 @@ class PredictCYP2D6():
       model = tf.keras.models.load_model(file)
       prediction = model.predict(self.X)
       
-      if all_predictions = None:
+      if all_predictions == None:
         all_predictions = prediction
       else:
         all_predictions.dstack((prediction, all_predictions))
@@ -25,4 +25,6 @@ class PredictCYP2D6():
     return all_predictions
 
 if __name__ == "__main__":
+  test_X = pd.read_csv('./data/test.samples.csv')
+  print(test_X.shape)
   P = PredictCYP2D6()
