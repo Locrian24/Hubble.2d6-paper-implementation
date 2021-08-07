@@ -3,28 +3,13 @@ import os
 import numpy as np
 import pandas as pd
 import argparse
-# Since simulated diplotypes are based on
-# existing star alleles, no need for custom annotation
-
-# take in vcf?
-# create embeddings
-#   - use *1 as reference
-
-#   - For each sample in the vcf
-#   - Look up embeddings for all listed variants - need external file
-#   - identify any variants without embeddings
-#   - Get the index where that embedding belongs - need external file
-#   - Replace the embedding at the location
-#   - output seq
-#   - pass through model
-#   - have a force options that will ignore indels or something.  not needed in v1
 
 # This pre-processing was forked from the original author's published code
 # Only main change is the encoding of diplotypes
 # https://github.com/gregmcinnes/Hubble2D6/blob/master/bin
 
 class Encode2Seq():
-  def __init__(self, vcf, labels, embedding_file, annotation_file, ref_seq, verbose=False, label_cols=[0, 6]):
+  def __init__(self, vcf, embedding_file, annotation_file, ref_seq, labels=None, verbose=False, label_cols=[0, 6]):
     self.vcf = vcf
     self.labels = labels
     self.embedding_file = embedding_file
@@ -75,6 +60,8 @@ class Encode2Seq():
     return data
 
   def get_labels(self, samples):
+    if self.labels == None: return None
+
     y_df = pd.read_csv(self.labels, header=None, index_col=0, usecols=self.label_cols)
     try:
       y = y_df.loc[samples].values
