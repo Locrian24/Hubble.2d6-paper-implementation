@@ -14,7 +14,6 @@ class PredictCYP2D6():
 
   def run(self):
     predictions = self.predict(self.X).mean(axis=0)
-    print(predictions)
     self.predictions = self.get_functions(predictions)
 
   def get_functions(self, pred):

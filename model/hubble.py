@@ -1,11 +1,12 @@
 import argparse
 import sys
 import os
+import numpy as np
 
 from encode_to_seq import Encode2Seq
 from predict import PredictCYP2D6
 
-def main(vcf):
+def main(vcf, verbose=True):
   # External files
   pwd = sys.path[0]
   EMBEDDINGS = os.path.join(pwd, '../data/embeddings.txt')
@@ -24,7 +25,7 @@ def main(vcf):
     for i, sample in enumerate(encoded_data.sample_names):
       print(sample, predict.predictions[i])
 
-  return np.c_[sample_names, predict.predictions]
+  return np.c_[encoded_data.sample_names, predict.predictions]
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
