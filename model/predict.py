@@ -26,11 +26,11 @@ class PredictCYP2D6():
     functions = []
     for i in range(pred.shape[0]):
       if cut1[i] == True and cut2[i] == True:
-        functions.append("Normal")
+        functions.append("Normal Function")
       elif cut1[i] == True and cut2[i] == False:
-        functions.append("Decreased function")
+        functions.append("Decreased Function")
       else:
-        functions.append("No function")
+        functions.append("No Function")
 
     return np.array(functions) 
 
