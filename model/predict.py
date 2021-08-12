@@ -16,6 +16,8 @@ class PredictCYP2D6():
     predictions = self.predict(self.X).mean(axis=0)
     self.predictions = self.get_functions(predictions)
 
+  # Cutoff values and logic are from the original repo:
+  # https://github.com/gregmcinnes/Hubble2D6
   def get_functions(self, pred):
     cutpoint_1 = 0.4260022
     cutpoint_2 = 0.7360413
