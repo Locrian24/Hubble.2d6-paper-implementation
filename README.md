@@ -4,7 +4,7 @@
 This repo contains the report, poster, and source code for an attempted implementation of the Hubble.2D6
 tool based on the [original paper](https://www.biorxiv.org/content/10.1101/684357v1). This was a term project for the SENG 474 class at the University of Victoria.
 
-***IMPORTANT***: This is an extremely naive and incomplete implementation of the Hubble.2d6 tool.
+***IMPORTANT***: This is an naive and incomplete implementation of the Hubble.2d6 tool.
 This was an undergraduate project and predictions and behaviour do not directly correspond to Hubble.2d6 for the most part and is far from a reliable tool.
 Check out the Hubble.2d6 [repo](https://github.com/gregmcinnes/Hubble2D6)
 
